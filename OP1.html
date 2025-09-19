@@ -78,7 +78,7 @@
       }
       const q=QUESTIONS[state.index];
       const ans=state.answers[q.id];
-      let html=`<div class='question-card'><div class='question-text'>${q.question}</div><div class='options'>`;
+      let html=`<div class='question-card'><div class='question-text'>Question ${state.index+1}/${QUESTIONS.length}: ${q.question}</div><div class='options'>`;
       q.options.forEach((o,i)=>{
         let cls='option';
         if(ans){

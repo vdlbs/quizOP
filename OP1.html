@@ -19,6 +19,7 @@
     button{padding:8px 14px;border:none;border-radius:6px;font-weight:bold;cursor:pointer}
     .btn{background:#ffb400;color:#0a0f1c}
     .btn:hover{filter:brightness(1.1)}
+    .score{margin-top:20px;padding:16px;border-radius:8px;background:#1b2a4a;font-size:1.2rem;text-align:center}
   </style>
 </head>
 <body>
@@ -29,19 +30,52 @@
       <button class="btn" onclick="prevQuestion()">Précédent</button>
       <button class="btn" onclick="nextQuestion()">Suivant</button>
     </div>
+    <div id="scoreArea"></div>
   </div>
 
   <script>
     const QUESTIONS=[
       {id:1,question:"Quel est le nom complet de 'Zoro' ?",options:["Roronoa Zoro","Zoro Roronoa","Roronoa Zolo","Z. Roronoa"],answer:0},
       {id:2,question:"Quel roi dirige Fish-Man Island ?",options:["Neptune","Otohime","Fischer Tiger","Arlong"],answer:0},
-      {id:3,question:"Qui est le père de Luffy ?",options:["Monkey D. Dragon","Monkey D. Garp","Gol D. Roger","Shanks"],answer:0}
+      {id:3,question:"Qui est le père de Luffy ?",options:["Monkey D. Dragon","Monkey D. Garp","Gol D. Roger","Shanks"],answer:0},
+      {id:4,question:"Quel est le nom du navire de l’équipage de Luffy après le Going Merry ?",options:["Thousand Sunny","Red Force","Oro Jackson","Polar Tang"],answer:0},
+      {id:5,question:"Qui a vaincu Kaido à Wano ?",options:["Luffy","Zoro","Kid","Law"],answer:0},
+      {id:6,question:"Quel fruit du démon Luffy possède-t-il ?",options:["Gomu Gomu no Mi","Mera Mera no Mi","Hito Hito no Mi","Yami Yami no Mi"],answer:0},
+      {id:7,question:"Quel était le rêve de Sanji enfant ?",options:["Trouver All Blue","Devenir Roi des Pirates","Trouver le One Piece","Être le meilleur épéiste"],answer:0},
+      {id:8,question:"Quel est le nom de famille de Nami ?",options:["Bellemere","Arlong","Aucun","Nojiko"],answer:2},
+      {id:9,question:"Qui est le frère juré de Luffy et Ace ?",options:["Sabo","Zoro","Shanks","Usopp"],answer:0},
+      {id:10,question:"Combien de Yonkô existaient avant la chute de Kaido et Big Mom ?",options:["4","3","5","2"],answer:0},
+      {id:11,question:"Qui est le capitaine des Heart Pirates ?",options:["Trafalgar D. Water Law","Eustass Kid","Killer","Bepo"],answer:0},
+      {id:12,question:"Qui est connu comme le meilleur épéiste du monde ?",options:["Dracule Mihawk","Roronoa Zoro","Shanks","Fujitora"],answer:0},
+      {id:13,question:"Quelle est la prime actuelle de Luffy après Wano (approx) ?",options:["3 milliards","1.5 milliard","4.5 milliards","5 milliards"],answer:0},
+      {id:14,question:"Qui a tué Portgas D. Ace ?",options:["Akainu","Kizaru","Barbe Noire","Kaido"],answer:0},
+      {id:15,question:"Quel est le véritable nom de Barbe Blanche ?",options:["Edward Newgate","Marshall D. Teach","Rocks D. Xebec","Edward Weevil"],answer:0},
+      {id:16,question:"Qui est la navigatrice des Mugiwara ?",options:["Nami","Robin","Nojiko","Vivi"],answer:0},
+      {id:17,question:"Quel est le fruit de Brook ?",options:["Yomi Yomi no Mi","Revive Revive no Mi","Kage Kage no Mi","Soru Soru no Mi"],answer:0},
+      {id:18,question:"Qui est le directeur de la prison Impel Down au moment de la guerre au sommet ?",options:["Magellan","Hannyabal","Shiryu","Sadi-chan"],answer:0},
+      {id:19,question:"Qui était le capitaine des Rocks Pirates ?",options:["Rocks D. Xebec","Gol D. Roger","Edward Newgate","Shiki"],answer:0},
+      {id:20,question:"Quelle est l’île d’origine de Franky ?",options:["Water 7","Ohara","Dressrosa","Baltigo"],answer:0},
+      {id:21,question:"Quelle est la profession de Chopper ?",options:["Médecin","Cuisinier","Navigateur","Charpentier"],answer:0},
+      {id:22,question:"Qui est la mère de Luffy ?",options:["Inconnue","Otohime","Boa Hancock","Alvida"],answer:0},
+      {id:23,question:"Qui a donné son chapeau de paille à Luffy ?",options:["Shanks","Rayleigh","Garp","Dragon"],answer:0},
+      {id:24,question:"Qui est le frère de Katakuri ?",options:["Daifuku","Oven","Perospero","Tous les précédents"],answer:3},
+      {id:25,question:"Quel est le rêve d’Usopp ?",options:["Devenir un valeureux guerrier des mers","Trouver All Blue","Être le meilleur sniper","Dessiner une carte du monde"],answer:0},
+      {id:26,question:"Qui est l’archéologue des Mugiwara ?",options:["Nico Robin","Nami","Kuzan","Carrot"],answer:0},
+      {id:27,question:"Qui était le premier commandant de Barbe Blanche ?",options:["Marco","Ace","Jozu","Vista"],answer:0},
+      {id:28,question:"Quel fruit du démon possède Barbe Noire ?",options:["Yami Yami no Mi","Gura Gura no Mi","Les deux","Aucun"],answer:2},
+      {id:29,question:"Quel est le but de Nico Robin ?",options:["Découvrir le siècle oublié","Être le meilleur épéiste","Devenir roi des pirates","Créer une encyclopédie"],answer:0},
+      {id:30,question:"Qui est le chef de la Révolution ?",options:["Monkey D. Dragon","Ivankov","Sabo","Koala"],answer:0}
     ];
 
     let state={index:0,answers:{}};
     const area=document.getElementById('quizArea');
+    const scoreArea=document.getElementById('scoreArea');
 
     function renderQuestion(){
+      if(state.index>=QUESTIONS.length){
+        showScore();
+        return;
+      }
       const q=QUESTIONS[state.index];
       const ans=state.answers[q.id];
       let html=`<div class='question-card'><div class='question-text'>${q.question}</div><div class='options'>`;
@@ -55,6 +89,7 @@
       });
       html+='</div></div>';
       area.innerHTML=html;
+      scoreArea.innerHTML='';
     }
 
     function selectOption(i){
@@ -64,8 +99,15 @@
       renderQuestion();
     }
 
-    function nextQuestion(){if(state.index<QUESTIONS.length-1){state.index++;renderQuestion();}}
+    function nextQuestion(){if(state.index<QUESTIONS.length){state.index++;renderQuestion();}}
     function prevQuestion(){if(state.index>0){state.index--;renderQuestion();}}
+
+    function showScore(){
+      const total=QUESTIONS.length;
+      const correct=Object.values(state.answers).filter(a=>a.correct).length;
+      area.innerHTML='';
+      scoreArea.innerHTML=`<div class='score'>Quiz terminé !<br>Votre score : ${correct} / ${total}</div>`;
+    }
 
     renderQuestion();
     window.selectOption=selectOption;

@@ -1,1 +1,400 @@
 #quiz one piece pour maël
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>One Piece — Gigantesque Quiz</title>
+  <style>
+    :root{--bg:#0b1220;--card:#0f1a2b;--accent:#ffcc00;--muted:#95a0b5;--success:#39d353;--danger:#ff4d4f}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;background:linear-gradient(180deg,#061021 0%, #081725 60%);color:#e6eef8}
+    .wrap{max-width:1100px;margin:28px auto;padding:20px}
+    header{display:flex;gap:16px;align-items:center}
+    header h1{margin:0;font-size:1.6rem;letter-spacing:0.6px}
+    .brand {width:68px;height:68px;border-radius:10px;background:linear-gradient(90deg,#111827,#0f172a);display:flex;align-items:center;justify-content:center;color:var(--accent);font-weight:700;font-size:20px;box-shadow:0 6px 24px rgba(0,0,0,.6)}
+
+    .grid{display:grid;grid-template-columns:320px 1fr;gap:18px;margin-top:18px}
+    aside{background:var(--card);padding:14px;border-radius:12px;box-shadow:0 8px 30px rgba(2,6,23,.6)}
+    main{padding:14px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));box-shadow:0 8px 30px rgba(2,6,23,.6)}
+
+    .btn{display:inline-block;padding:8px 12px;border-radius:8px;background:var(--accent);color:#0b1220;font-weight:600;text-decoration:none;border:none;cursor:pointer}
+    .muted{color:var(--muted)}
+
+    .filters label{display:block;margin-bottom:8px;font-size:0.9rem}
+    select,input[type=number],input[type=text]{width:100%;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:inherit}
+    .category-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+    .chip{padding:6px 10px;border-radius:999px;background:rgba(255,255,255,0.03);cursor:pointer;border:1px solid rgba(255,255,255,0.02)}
+    .chip.active{background:linear-gradient(90deg,rgba(255,204,0,.12),rgba(255,204,0,.05));border-color:rgba(255,204,0,.2);box-shadow:0 6px 18px rgba(255,204,0,.06)}
+
+    .panel{margin-bottom:12px}
+    .meta{display:flex;gap:8px;align-items:center;margin-top:10px}
+    .meta div{padding:8px 12px;background:rgba(255,255,255,0.02);border-radius:8px}
+
+    .question-card{padding:18px;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,0.01),transparent);box-shadow:inset 0 -1px 0 rgba(255,255,255,0.02)}
+    .question-text{font-size:1.1rem;margin-bottom:12px}
+    .options{display:grid;gap:10px}
+    .option{padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);cursor:pointer}
+    .option:hover{transform:translateY(-2px);transition:all .15s}
+    .option.correct{border-color:var(--success);background:rgba(57,211,83,0.06)}
+    .option.wrong{border-color:var(--danger);background:rgba(255,77,79,0.06)}
+
+    footer{display:flex;justify-content:space-between;align-items:center;margin-top:14px}
+    .small{font-size:0.9rem;color:var(--muted)}
+
+    .result{padding:14px;border-radius:10px;background:linear-gradient(90deg,rgba(255,204,0,0.06),rgba(255,204,0,0.02));color:#081725}
+
+    .search{display:flex;gap:8px}
+
+    @media (max-width:900px){.grid{grid-template-columns:1fr;}.brand{width:56px;height:56px}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">OP</div>
+      <div>
+        <h1>One Piece — Quiz gigantesque</h1>
+        <div class="muted">Des milliers de questions — précises, catégorisées, et exportables.</div>
+      </div>
+    </header>
+
+    <div class="grid">
+      <aside>
+        <div class="panel">
+          <label for="mode">Mode</label>
+          <select id="mode">
+            <option value="practice">Pratique (feedback immédiat)</option>
+            <option value="exam">Examen (pas d'explication pendant)</option>
+          </select>
+        </div>
+
+        <div class="panel filters">
+          <label>Catégories</label>
+          <div class="category-list" id="categories"></div>
+        </div>
+
+        <div class="panel">
+          <label for="difficulty">Difficulté (min)</label>
+          <select id="difficulty">
+            <option value="any">Toutes</option>
+            <option value="1">Facile</option>
+            <option value="2">Moyen</option>
+            <option value="3">Difficile</option>
+            <option value="4">Expert</option>
+          </select>
+        </div>
+
+        <div class="panel">
+          <label for="nQuestions">Nombre de questions</label>
+          <input type="number" id="nQuestions" value="15" min="1" max="200">
+        </div>
+
+        <div class="panel">
+          <label>Recherche rapide</label>
+          <div class="search"><input id="qSearch" type="text" placeholder="mot-clé (ex: 'Yonko', 'Mihawk')"><button class="btn" id="btnFilter">Filtrer</button></div>
+        </div>
+
+        <div class="panel">
+          <button class="btn" id="startBtn">Démarrer le quiz</button>
+          <button id="resetBtn" style="margin-left:8px;padding:8px 10px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.06);color:inherit">Réinitialiser progrès</button>
+        </div>
+
+        <div class="panel small">
+          <strong>Trucs:</strong>
+          <ul>
+            <li>Ajoutez des questions via "Importer JSON".</li>
+            <li>Le site sauvegarde vos scores localement.</li>
+            <li>Utilisez les touches 1-4 pour sélectionner une réponse.</li>
+          </ul>
+        </div>
+
+        <div class="panel">
+          <label>Importer / Exporter</label>
+          <textarea id="jsonImport" placeholder='Collez ici un tableau JSON de questions' style="width:100%;height:120px;background:transparent;color:inherit;border-radius:8px;padding:8px;border:1px solid rgba(255,255,255,0.04)"></textarea>
+          <div style="margin-top:8px;display:flex;gap:8px"><button id="importBtn" class="btn">Importer</button><button id="exportBtn" class="btn" style="background:transparent;color:var(--accent);border:1px solid rgba(255,204,0,0.18)">Exporter JSON</button></div>
+        </div>
+
+      </aside>
+
+      <main>
+        <div class="meta">
+          <div>Questions disponibles: <span id="totalCount">0</span></div>
+          <div>Choisies: <span id="chosenCount">0</span></div>
+          <div>Temps: <span id="timer">00:00</span></div>
+        </div>
+
+        <div id="quizArea" style="margin-top:12px"></div>
+
+        <footer>
+          <div class="small">Raccourci clavier: 1-4 réponses • N pour suivant • P pour précédent</div>
+          <div><button id="showStats" class="btn" style="background:transparent;color:var(--accent);border:1px solid rgba(255,204,0,0.18)">Afficher les statistiques</button></div>
+        </footer>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    /* ==========================
+       Base de données de questions
+       Chaque question: {
+         id, category, difficulty (1-4), question, options:[], answer: index (0..n-1), explanation
+       }
+       Remplacez / ajoutez des questions pour rendre le quiz "gigantesque".
+       ==========================*/
+
+    const QUESTIONS = [
+      {id:1,category:'Personnages',difficulty:2,question:"Quel est le nom complet de 'Zoro' ?",options:["Roronoa Zoro","Zoro Roronoa","Roronoa Zolo","Z. Roronoa"],answer:0,explanation:"Son nom est Roronoa Zoro (parfois orthographié Zolo dans certaines traductions)."},
+      {id:2,category:'Histoire',difficulty:3,question:"Quel était le nom du souverain de Fish-Man Island avant l'arrivée de Luffy et de son équipage ?",options:["King Neptune","King Otohime","Fischer Tiger","Neptune II"],answer:0,explanation:"Le roi de l'île des Hommes-Poissons était Neptune."},
+      {id:3,category:'Techniques',difficulty:4,question:"Quelle est la nature principale du Haki 'Busoshoku' ?",options:["Observation","Armement","Roar (Conquête)","Volonté"],answer:1,explanation:"Busoshoku Haki est l'Haki d'armement, utilisé pour durcir le corps et toucher les utilisateurs de Fruits du Démon."},
+      {id:4,category:'Armes',difficulty:3,question:"Quelle épée est connue comme l'une des 'O Wazamono' possédée par Roronoa Zoro ?",options:["Wado Ichimonji","Shusui","Enma","Tous les trois"],answer:3,explanation:"Wado Ichimonji, Shusui et Enma (Emna/Enma) font partie des lames remarquables associées à Zoro à différents moments."},
+      {id:5,category:'Lieux',difficulty:2,question:"Dans quel archipel se trouve l'île de Punk Hazard ?",options:["Grand Line","Red Line","New World","Grand Line - Avant/posterieur"],answer:0,explanation:"Punk Hazard est située sur la Grand Line, à la frontière entre la première moitié et le Nouveau Monde."},
+      {id:6,category:'Personnages',difficulty:4,question:"Qui a enseigné le Haki à Luffy durant l'entraînement de deux ans ?",options:["Silvers Rayleigh","Dr. Kureha","Rayleigh et Barbe Blanche","Jinbe"],answer:0,explanation:"Silvers Rayleigh a entraîné Luffy pour lui enseigner le Haki."},
+      {id:7,category:'Navy',difficulty:3,question:"Quel amiral a utilisé le pouvoir du 'Light-Light Fruit' (Pika Pika no Mi) ?",options:["Akainu (Sakazuki)","Kizaru (Borsalino)","Aokiji (Kuzan)","Fujitora (Issho)"],answer:1,explanation:"Kizaru (Borsalino) utilise le Pika Pika no Mi, fruit de la lumière."},
+      {id:8,category:'Historique',difficulty:4,question:"Comment s'appelle l'arme antique révélée sur l'île de Shandora ?",options:["Pluton","Poseidon","Uranus","Le Clé"],answer:0,explanation:"Pluton est l'arme antique mentionnée en relation avec Shandora et Water 7/Enies Lobby arcs."},
+      {id:9,category:'Fruit du Démon',difficulty:4,question:"Quel est le pouvoir principal du fruit Goro Goro no Mi ?",options:["Contrôle de la glace","Contrôle de la foudre","Transformation en pierre","Téléportation"],answer:1,explanation:"Goro Goro no Mi est un fruit de type Logia qui contrôle la foudre, utilisé par Enel."},
+      {id:10,category:'Personnages',difficulty:3,question:"Quel membre des Chapeaux de paille est médecin ?",options:["Brook","Nami","Chopper","Robin"],answer:2,explanation:"Tony Tony Chopper est le médecin de l'équipage."},
+      {id:11,category:'Organisations',difficulty:4,question:"Quel est le nom du groupe d'assassins qui a tenté d'assassiner le Roi Riku à Dressrosa ?",options:["Donquixote Pirates","La Marine","Les Tontattas","Les Royal Army (colisée)"],answer:0,explanation:"Les Donquixote Pirates, menés par Doflamingo, étaient au coeur des événements sur Dressrosa."},
+      {id:12,category:'Lieux',difficulty:3,question:"Quel est le nom de la cité céleste où vivait le peuple de Skypiea ?",options:["Skypiea","Shandora","Upper Yard","Sky Island"],answer:0,explanation:"Skypiea est l'île céleste emblématique dans l'arc du même nom."},
+      {id:13,category:'Personnages',difficulty:4,question:"Quel est l'ancien titre de Portgas D. Ace au sein de l'équipage de Barbe Blanche ?",options:["Vice-capitaine","Commandant de la 2e division","3e division","Capitaine adjoint"],answer:1,explanation:"Ace était commandant de la 2e division de l'équipage de Barbe Blanche."},
+      {id:14,category:'Techniques',difficulty:3,question:"Quel style de combat Sanji utilise-t-il principalement ?",options:["Combats à l'épée","Karate/poings","Coup de pied (Jambes) - Black Leg Style","Arts martiaux mystiques"],answer:2,explanation:"Sanji utilise principalement ses jambes (Black Leg Style)."},
+      {id:15,category:'Histoire',difficulty:4,question:"Quel était l'objectif principal de l'organisation révolutionnaire dirigée par Monkey D. Dragon ?",options:["Renverser les Empereurs","Renverser le Gouvernement Mondial","Devenir Shichibukai","Protéger les pirates"],answer:1,explanation:"Les Révolutionnaires luttent contre le Gouvernement Mondial et son oppression."},
+      {id:16,category:'Personnages',difficulty:3,question:"Quel est le surnom de Trafalgar Law ?",options:["Le chirurgien de la mort","Le roi des pirates","Le renégat de l'océan","Le tueur de dragons"],answer:0,explanation:"Trafalgar D. Water Law est souvent appelé 'le chirurgien de la mort'."},
+      {id:17,category:'Fruit du Démon',difficulty:4,question:"Quel fruit du démon permet à son utilisateur d'invoquer et contrôler le feu ?",options:["Mera Mera no Mi","Hie Hie no Mi","Magu Magu no Mi","Sui Sui no Mi"],answer:0,explanation:"Mera Mera no Mi confère le pouvoir du feu (utilisé par Ace puis Sabo)."},
+      {id:18,category:'Lieux',difficulty:3,question:"Quel archipel abrite l'atelier de Franky, 'Tom's Workers' ?",options:["Water 7","Whole Cake Island","Sabaody Archipelago","Flevance"],answer:0,explanation:"Tom's Workers est lié à Water 7 et Franky."},
+      {id:19,category:'Personnages',difficulty:4,question:"Qui a décapité Bartholomew Kuma (au sens figuré) pour le transformer en arme humaine ?",options:["Le Gouvernement Mondial (Pacifistas)","Dr. Vegapunk","Kizaru","Aokiji"],answer:0,explanation:"Kuma a été transformé en une arme humaine par l'intervention du Gouvernement et Vegapunk (dans l'histoire)."},
+      {id:20,category:'Événements',difficulty:4,question:"Quel était le nom du tournoi qui a lieu sur l'île de Dressrosa et qui servait de façade aux plans de Doflamingo ?",options:["Corrida Colosseum","Baratie Open","Colisée de Punk Hazard","Pirate Fest"],answer:0,explanation:"Le Corrida Colosseum était central dans l'arc Dressrosa."}
+    ];
+
+    /* ==========================
+       Logique du Quiz
+       ==========================*/
+
+    let state = {
+      pool: [...QUESTIONS],
+      chosen: [],
+      index: 0,
+      mode: 'practice',
+      running: false,
+      startTs: null,
+      elapsed:0,
+      answers: {}, // id -> {selected, correct}
+    }
+
+    const $ = id => document.getElementById(id);
+
+    function init(){
+      renderCategories();
+      $('totalCount').innerText = QUESTIONS.length;
+      attachHandlers();
+      loadProgress();
+    }
+
+    function uniqueCategories(){
+      const set = new Set(QUESTIONS.map(q=>q.category));
+      return Array.from(set).sort();
+    }
+
+    function renderCategories(){
+      const container = $('categories');
+      container.innerHTML='';
+      uniqueCategories().forEach(cat=>{
+        const btn = document.createElement('button');btn.className='chip';btn.innerText=cat;btn.onclick=()=>{btn.classList.toggle('active');}
+        container.appendChild(btn);
+      })
+    }
+
+    function attachHandlers(){
+      $('btnFilter').onclick = applyFilters;
+      $('startBtn').onclick = startQuiz;
+      $('importBtn').onclick = importJSON;
+      $('exportBtn').onclick = exportJSON;
+      $('resetBtn').onclick = resetProgress;
+      $('showStats').onclick = showStats;
+      window.addEventListener('keydown', kb);
+    }
+
+    function kb(e){
+      if(!state.running) return;
+      if(['1','2','3','4'].includes(e.key)) selectOption(parseInt(e.key)-1);
+      if(e.key.toLowerCase()==='n') nextQuestion();
+      if(e.key.toLowerCase()==='p') prevQuestion();
+    }
+
+    function applyFilters(){
+      const activeCats = Array.from(document.querySelectorAll('.chip.active')).map(n=>n.innerText);
+      const diff = $('difficulty').value;
+      const qk = $('qSearch').value.trim().toLowerCase();
+      let pool = [...QUESTIONS];
+      if(activeCats.length) pool = pool.filter(q=>activeCats.includes(q.category));
+      if(diff!=='any') pool = pool.filter(q=>q.difficulty>=parseInt(diff));
+      if(qk) pool = pool.filter(q=> (q.question+ ' ' + (q.options||[]).join(' ')+ ' ' + (q.explanation||'')).toLowerCase().includes(qk));
+      state.pool = pool;
+      $('totalCount').innerText = pool.length;
+      alert(`${pool.length} questions filtrées prêtes.`);
+    }
+
+    function startQuiz(){
+      const n = parseInt($('nQuestions').value) || 10;
+      if(state.pool.length===0){alert('Aucune question dans le pool — importez-en ou enlevez des filtres.');return}
+      const shuffled = shuffle([...state.pool]).slice(0, Math.min(n,state.pool.length));
+      state.chosen = shuffled;
+      state.index = 0;
+      state.answers = {};
+      state.mode = $('mode').value;
+      state.running = true;
+      state.startTs = Date.now();
+      $('chosenCount').innerText = state.chosen.length;
+      renderQuestion();
+      startTimer();
+    }
+
+    function shuffle(a){
+      for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}
+      return a;
+    }
+
+    function renderQuestion(){
+      const area = $('quizArea');
+      if(!state.running){area.innerHTML='<div class="small muted">Le quiz n\'est pas démarré.</div>';return}
+      const q = state.chosen[state.index];
+      if(!q){area.innerHTML='<div class="small muted">Plus de questions.</div>';return}
+      const userAns = state.answers[q.id];
+      let html = `<div class="question-card">
+        <div class="question-text">Q${state.index+1}. ${escapeHtml(q.question)}</div>
+        <div class="options">`;
+      q.options.forEach((opt,i)=>{
+        let cls='option';
+        if(userAns){
+          if(i===q.answer) cls+=' correct';
+          if(i===userAns.selected && !userAns.correct) cls+=' wrong';
+        }
+        html += `<div class="option" data-i="${i}" onclick="selectOption(${i})">${String.fromCharCode(65+i)}. ${escapeHtml(opt)}</div>`;
+      });
+      html += `</div>`;
+      if(userAns){
+        html += `<div style="margin-top:12px;padding:10px;border-radius:8px;background:rgba(255,255,255,0.02)"><strong>${userAns.correct? 'Correct!':'Incorrect'}</strong><div style="margin-top:8px" class="muted">Explication: ${escapeHtml(q.explanation||'')}</div></div>`;
+      }
+      html += `<div style="margin-top:12px;display:flex;gap:8px;align-items:center"><button class="btn" onclick="prevQuestion()">Précédent</button><button class="btn" onclick="nextQuestion()">Suivant</button><div style="margin-left:auto" class="small muted">${state.index+1}/${state.chosen.length} • Cat: ${q.category} • Diff: ${q.difficulty}</div></div>`;
+      html += `</div>`;
+      area.innerHTML = html;
+      highlightSelected(q);
+    }
+
+    function highlightSelected(q){
+      const userAns = state.answers[q.id];
+      const opts = document.querySelectorAll('.option');
+      opts.forEach(el=>{
+        el.classList.remove('correct','wrong');
+        const i = parseInt(el.dataset.i);
+        if(userAns){
+          if(i===q.answer) el.classList.add('correct');
+          if(i===userAns.selected && !userAns.correct) el.classList.add('wrong');
+        }
+      })
+    }
+
+    function selectOption(i){
+      if(!state.running) return;
+      const q = state.chosen[state.index];
+      const correct = i===q.answer;
+      state.answers[q.id] = {selected:i,correct};
+      saveProgress();
+      if(state.mode==='practice'){
+        renderQuestion();
+      } else {
+        // exam: don't reveal explanation until the end
+        renderQuestion();
+      }
+    }
+
+    function nextQuestion(){
+      if(state.index < state.chosen.length-1) state.index++; else finishQuiz();
+      renderQuestion();
+    }
+    function prevQuestion(){ if(state.index>0) state.index--; renderQuestion(); }
+
+    function finishQuiz(){
+      state.running = false;
+      state.elapsed = Math.floor((Date.now()-state.startTs)/1000);
+      stopTimer();
+      renderResults();
+      saveProgress();
+    }
+
+    function renderResults(){
+      const area = $('quizArea');
+      const total = state.chosen.length;
+      const correct = Object.values(state.answers).filter(a=>a.correct).length;
+      const pct = Math.round((correct/total)*100);
+      let html = `<div class="result"><h3>Résultats</h3><p>Score: <strong>${correct}/${total}</strong> (${pct}%)</p><p>Temps passé: ${formatTime(state.elapsed)}</p></div>`;
+      html += `<div style="margin-top:12px">`;
+      state.chosen.forEach((q,idx)=>{
+        const ans = state.answers[q.id];
+        html += `<div style="margin-top:10px;padding:10px;border-radius:8px;background:rgba(255,255,255,0.02)"><strong>Q${idx+1} - ${escapeHtml(q.question)}</strong><div class="muted">Votre réponse: ${ans? escapeHtml(q.options[ans.selected]) : '<em>non répondu</em>'} • ${ans && ans.correct? '<span style="color:var(--success)">Correct</span>' : '<span style="color:var(--danger)">Incorrect</span>'}</div><div class="muted">Explication: ${escapeHtml(q.explanation||'')}</div></div>`;
+      })
+      html += `</div>`;
+      area.innerHTML = html;
+    }
+
+    /* Timer */
+    let timerI=null;
+    function startTimer(){ if(timerI) clearInterval(timerI); timerI = setInterval(()=>{ const s = Math.floor((Date.now()-state.startTs)/1000); $('timer').innerText = formatTime(s); },1000)}
+    function stopTimer(){ if(timerI) clearInterval(timerI); timerI=null }
+    function formatTime(s){ const mm = String(Math.floor(s/60)).padStart(2,'0'); const ss = String(s%60).padStart(2,'0'); return `${mm}:${ss}` }
+
+    /* Import / Export */
+    function importJSON(){
+      const raw = $('jsonImport').value.trim();
+      if(!raw) {alert('Collez du JSON valide.');return}
+      try{
+        const arr = JSON.parse(raw);
+        if(!Array.isArray(arr)) throw new Error('Doit être un tableau de questions');
+        arr.forEach((q,i)=>{ q.id = Math.max(...QUESTIONS.map(x=>x.id))+i+1; QUESTIONS.push(q); });
+        state.pool = [...QUESTIONS];
+        $('totalCount').innerText = QUESTIONS.length;
+        alert(`Import réussi : ${arr.length} questions ajoutées.`);
+      }catch(e){alert('Erreur JSON: '+e.message)}
+    }
+
+    function exportJSON(){
+      const data = JSON.stringify(QUESTIONS, null, 2);
+      const blob = new Blob([data], {type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href=url; a.download='onepiece-quiz-questions.json'; document.body.appendChild(a); a.click(); a.remove();
+    }
+
+    /* Progress (localStorage) */
+    function saveProgress(){
+      const key = 'op_quiz_progress_v1';
+      const payload = {answers:state.answers,chosenIds:state.chosen.map(q=>q.id),elapsed:state.elapsed};
+      localStorage.setItem(key, JSON.stringify(payload));
+    }
+    function loadProgress(){
+      const key = 'op_quiz_progress_v1';
+      const raw = localStorage.getItem(key); if(!raw) return;
+      try{ const p = JSON.parse(raw); state.answers = p.answers||{}; }catch(e){}
+    }
+    function resetProgress(){ if(confirm('Supprimer les données locales (scores & progrès) ?')){ localStorage.removeItem('op_quiz_progress_v1'); alert('Progression réinitialisée.'); }}
+
+    function showStats(){
+      const total = QUESTIONS.length;
+      const byCat = {};
+      QUESTIONS.forEach(q=>{ byCat[q.category]=(byCat[q.category]||0)+1 });
+      let s = `Total questions: ${total}\n\nPar catégorie:\n`;
+      Object.keys(byCat).forEach(k=>s+=`${k}: ${byCat[k]}\n`);
+      alert(s);
+    }
+
+    /* Helpers */
+    function escapeHtml(str){ if(!str) return ''; return String(str).replace(/[&<>"']/g, function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];}); }
+
+    /* Keyboard-select wrapper for inline onclick calls */
+    window.selectOption = function(i){ selectOption(i); }
+    window.nextQuestion = nextQuestion;
+    window.prevQuestion = prevQuestion;
+
+    init();
+  </script>
+</body>
+</html>

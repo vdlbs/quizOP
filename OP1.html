@@ -1,114 +1,76 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-
-const questions = [
-  {
-    question: "Quel membre de l'équipage de Roger est le seul encore en vie à connaître toute la véritable histoire du siècle oublié ?",
-    options: ["Scopper Gaban", "Silvers Rayleigh", "Shanks", "Crocus"],
-    answer: "Silvers Rayleigh",
-  },
-  {
-    question: "Lors de la bataille de Marineford, quel est le nom exact de la technique de Barbe Blanche qui a failli fendre la mer entière ?",
-    options: [
-      "Gekishin (Tremblement sismique)",
-      "Shima Yurashi (Secousse d'île)",
-      "Kaishin (Onde destructrice)",
-      "Tenchi Hakai (Destruction céleste)",
-    ],
-    answer: "Shima Yurashi (Secousse d'île)",
-  },
-  {
-    question: "Dans le chapitre où Nico Robin lit le premier Ponéglyphe à Skypiea, quel dieu est mentionné dans l'inscription ?",
-    options: ["Uranus", "Poseidon", "Pluton", "Nika"],
-    answer: "Poseidon",
-  },
-  {
-    question: "Quel fruit du démon a été utilisé pour créer les Pacifistas selon les recherches de Vegapunk ?",
-    options: [
-      "Kizaru - Pika Pika no Mi",
-      "Kuma - Nikyu Nikyu no Mi",
-      "Caesar - Gasu Gasu no Mi",
-      "Doflamingo - Ito Ito no Mi",
-    ],
-    answer: "Kizaru - Pika Pika no Mi",
-  },
-  {
-    question: "Dans le flashback d’Ohara, quel amiral en devenir a épargné Nico Robin lors de la Buster Call ?",
-    options: ["Aokiji", "Akainu", "Fujitora", "Kizaru"],
-    answer: "Aokiji",
-  },
-  {
-    question: "Quel est le nom exact du journal que lit souvent Nico Robin pour obtenir des informations historiques ?",
-    options: ["Morning Sun", "South Bird Times", "World Economy News", "Revue Historique du Siècle"],
-    answer: "World Economy News",
-  },
-  {
-    question: "Lors du combat entre Kaido et Luffy à Wano, quel est le nom officiel de la forme où Luffy utilise le pouvoir éveillé de son fruit ?",
-    options: ["Gear 5 - Nika", "Gear 5 - Sun God", "Gear 5 - Joy Boy", "Gear 5 - Dawn"],
-    answer: "Gear 5 - Nika",
-  },
-];
-
-export default function OnePieceQuiz() {
-  const [current, setCurrent] = useState(0);
-  const [score, setScore] = useState(0);
-  const [finished, setFinished] = useState(false);
-
-  const handleAnswer = (option) => {
-    if (option === questions[current].answer) {
-      setScore(score + 1);
-    }
-    if (current + 1 < questions.length) {
-      setCurrent(current + 1);
-    } else {
-      setFinished(true);
-    }
-  };
-
-  return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-blue-800 to-indigo-900 text-white p-6">
-      <h1 className="text-3xl font-bold mb-6">⚔️ One Piece Quiz 🏴‍☠️</h1>
-
-      {!finished ? (
-        <Card className="w-full max-w-md bg-white text-black shadow-xl rounded-2xl">
-          <CardContent className="p-6">
-            <h2 className="text-xl font-semibold mb-4">
-              {questions[current].question}
-            </h2>
-            <div className="grid gap-3">
-              {questions[current].options.map((option, i) => (
-                <Button
-                  key={i}
-                  onClick={() => handleAnswer(option)}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl"
-                >
-                  {option}
-                </Button>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      ) : (
-        <Card className="w-full max-w-md bg-white text-black shadow-xl rounded-2xl">
-          <CardContent className="p-6 text-center">
-            <h2 className="text-2xl font-bold mb-4">🎉 Quiz terminé !</h2>
-            <p className="text-lg mb-2">Ton score : {score}/{questions.length}</p>
-            <Button
-              onClick={() => {
-                setCurrent(0);
-                setScore(0);
-                setFinished(false);
-              }}
-              className="bg-green-600 hover:bg-green-700 text-white rounded-xl"
-            >
-              Rejouer
-            </Button>
-          </CardContent>
-        </Card>
-      )}
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>One Piece — Quiz</title>
+  <style>
+    body{margin:0;font-family:sans-serif;background:#0a0f1c;color:#f0f4fa}
+    .wrap{max-width:900px;margin:20px auto;padding:20px}
+    h1{color:#ffb400}
+    .question-card{padding:16px;margin-top:16px;border-radius:8px;background:#162447;box-shadow:0 4px 12px rgba(0,0,0,.5)}
+    .question-text{font-size:1.2rem;margin-bottom:12px}
+    .options{display:grid;gap:10px}
+    .option{padding:12px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);cursor:pointer;user-select:none;background:#1b2a4a;transition:background .2s}
+    .option:hover{background:#243b6b}
+    .option.correct{border-color:#4caf50;background:rgba(76,175,80,0.2)}
+    .option.wrong{border-color:#e53935;background:rgba(229,57,53,0.2)}
+    .controls{margin-top:12px;display:flex;justify-content:space-between}
+    button{padding:8px 14px;border:none;border-radius:6px;font-weight:bold;cursor:pointer}
+    .btn{background:#ffb400;color:#0a0f1c}
+    .btn:hover{filter:brightness(1.1)}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>One Piece — Quiz</h1>
+    <div id="quizArea"></div>
+    <div class="controls">
+      <button class="btn" onclick="prevQuestion()">Précédent</button>
+      <button class="btn" onclick="nextQuestion()">Suivant</button>
     </div>
-  );
-}
+  </div>
 
-      
+  <script>
+    const QUESTIONS=[
+      {id:1,question:"Quel est le nom complet de 'Zoro' ?",options:["Roronoa Zoro","Zoro Roronoa","Roronoa Zolo","Z. Roronoa"],answer:0},
+      {id:2,question:"Quel roi dirige Fish-Man Island ?",options:["Neptune","Otohime","Fischer Tiger","Arlong"],answer:0},
+      {id:3,question:"Qui est le père de Luffy ?",options:["Monkey D. Dragon","Monkey D. Garp","Gol D. Roger","Shanks"],answer:0}
+    ];
+
+    let state={index:0,answers:{}};
+    const area=document.getElementById('quizArea');
+
+    function renderQuestion(){
+      const q=QUESTIONS[state.index];
+      const ans=state.answers[q.id];
+      let html=`<div class='question-card'><div class='question-text'>${q.question}</div><div class='options'>`;
+      q.options.forEach((o,i)=>{
+        let cls='option';
+        if(ans){
+          if(i===q.answer)cls+=' correct';
+          if(i===ans.selected && !ans.correct)cls+=' wrong';
+        }
+        html+=`<div class='${cls}' onclick='selectOption(${i})'>${String.fromCharCode(65+i)}. ${o}</div>`;
+      });
+      html+='</div></div>';
+      area.innerHTML=html;
+    }
+
+    function selectOption(i){
+      const q=QUESTIONS[state.index];
+      const correct=i===q.answer;
+      state.answers[q.id]={selected:i,correct};
+      renderQuestion();
+    }
+
+    function nextQuestion(){if(state.index<QUESTIONS.length-1){state.index++;renderQuestion();}}
+    function prevQuestion(){if(state.index>0){state.index--;renderQuestion();}}
+
+    renderQuestion();
+    window.selectOption=selectOption;
+    window.nextQuestion=nextQuestion;
+    window.prevQuestion=prevQuestion;
+  </script>
+</body>
+</html>
